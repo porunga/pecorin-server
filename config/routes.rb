@@ -66,6 +66,6 @@ PecorinServer::Application.routes.draw do
   resources :device_registrations, :only => :create
   resources :pecori, :only => :create
 
-  put 'user/:uid/location', :to => 'location#update', :via => :put
+  put 'user/:facebook_id/location', :to => 'location#update', :via => :put
 
 end
