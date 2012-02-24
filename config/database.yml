@@ -12,11 +12,11 @@ development:
   adapter: mysql2
   encoding: utf8
   reconnect: false
-  database: pecorin-server_development
+  database: pecorin_development
   pool: 5
-  username: root
-  password:
-  socket: /opt/local/var/run/mysql5/mysqld.sock
+  username: pecorin
+  password: pass#pecorin
+  socket: /var/run/mysqld/mysqld.sock
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -25,18 +25,18 @@ test:
   adapter: mysql2
   encoding: utf8
   reconnect: false
-  database: pecorin-server_test
+  database: pecorin_test
   pool: 5
-  username: root
-  password:
-  socket: /opt/local/var/run/mysql5/mysqld.sock
+  username: pecorin
+  password: pass#pecorin
+  socket: /var/run/mysqld/mysqld.sock
 
 production:
   adapter: mysql2
   encoding: utf8
   reconnect: false
-  database: pecorin-server_production
+  database: pecorin_production
   pool: 5
-  username: root
-  password:
-  socket: /opt/local/var/run/mysql5/mysqld.sock
+  username: pecorin
+  password: pass#pecorin
+  socket: /var/run/mysqld/mysqld.sock
