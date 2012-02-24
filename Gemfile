@@ -40,3 +40,4 @@ end
 gem 'therubyracer'
 gem 'omniauth'
 gem 'omniauth-facebook'
+gem 'big_door', '0.0.3'
