@@ -1,4 +1,5 @@
 PecorinServer::Application.routes.draw do
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
@@ -60,4 +61,8 @@ PecorinServer::Application.routes.draw do
   match '/auth/failure' => 'sessions#failure'
   match '/login' => 'sessions#new', :as => :login
   match '/logout' => 'session#destroy', :as => :logout
+
+  resources :device_registrations, :only => :create
+  resources :pecori, :only => :create
+
 end
