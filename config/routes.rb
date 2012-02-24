@@ -61,4 +61,6 @@ PecorinServer::Application.routes.draw do
   match '/auth/failure' => 'sessions#failure'
   match '/login' => 'sessions#new', :as => :login
   match '/logout' => 'session#destroy', :as => :logout
+
+  put 'user/:uid/location', :to => 'location#update', :via => :put
 end
