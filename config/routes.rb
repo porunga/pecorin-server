@@ -61,6 +61,7 @@ PecorinServer::Application.routes.draw do
   match '/auth/failure' => 'sessions#failure'
   match '/login' => 'sessions#new', :as => :login
   match '/logout' => 'sessions#destroy', :as => :logout
+  match '/users' => 'user#index'
 
   resources :device_registrations, :only => :create
   resources :pecori, :only => :create
