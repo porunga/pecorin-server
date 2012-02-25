@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+require 'json'
+
 class PecoriController < ApplicationController
   protect_from_forgery :except => :create
 
@@ -15,8 +17,13 @@ class PecoriController < ApplicationController
      token = C2dmAccess.get_client_login()
      message = {:message => pecorer_name + "さんがぺこりしてます！" }
      if C2dmAccess.c2dm_post_message(pecoree_registration_id, token, message)
-       render :text =>  "Success to send a message", :status => 200
+       result = Level.update_count(pecorer_facebook_id, "c2dm")
+       if result
+         render :json =>  result.to_json, :status => 200
        else 
+         render :text => "Success to send a message, but failed to update score", :status => 500
+       end
+     else 
        render :text =>  "Failure to send a message", :status => 500
      end
    end
