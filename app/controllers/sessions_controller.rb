@@ -1,5 +1,4 @@
 require 'json'
-require 'digest/sha2'
 
 class SessionsController < ApplicationController
 
@@ -7,12 +6,14 @@ class SessionsController < ApplicationController
 
 	def create
 		auth = request.env["omniauth.auth"]
-		user = User.where(:facebook_id => auth['uid']).first || User.create_with_omniauth(auth)
-		pecorin_token = Digest::SHA256.hexdigest("#{user.id}#{Time.now}")
+		user = User.where(:facebook_id => auth['uid']).first
+		if user
+			user.update_with_omniauth(auth)
+		else
+			user = User.create_with_omniauth(auth)
+		end
 		session[:user_id] = user.id
-		user.pecorin_token = pecorin_token
-		user.save!
-		redirect_to :action => "success", :auth => pecorin_token
+		redirect_to :action => "success", :auth => user.pecorin_token
 	end
 
 	def success
