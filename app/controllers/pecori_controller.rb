@@ -7,6 +7,7 @@ class PecoriController < ApplicationController
  def create
    pecorer_facebook_id = params["pecorer_facebook_id"]
    pecoree_facebook_id = params["pecoree_facebook_id"]
+   type = params["type"]
 
    @pecoree_user = User.find_by_facebook_id(pecoree_facebook_id)
    @pecorer_user = User.find_by_facebook_id(pecorer_facebook_id)
@@ -15,9 +16,10 @@ class PecoriController < ApplicationController
      pecorer_name = @pecorer_user.name
  
      token = C2dmAccess.get_client_login()
-     message = {:message => pecorer_name + "さんがぺこりしてます！" }
+     pecori_message = "Pecori from " + pecorer_name
+     message = {:message => pecori_message }
      if C2dmAccess.c2dm_post_message(pecoree_registration_id, token, message)
-       result = Level.update_count(pecorer_facebook_id, "c2dm")
+       result = Level.update_count(@pecorer_user, type)
        if result
          render :json =>  result.to_json, :status => 200
        else 
