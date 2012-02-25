@@ -5,11 +5,11 @@ APP_SECRET = '********'
 
 class Level < ActiveRecord::Base
 
-	def self.update_count(user, type)
+	def self.update_count(facebook_id, type)
 		client = BigDoor::Client.new(APP_SECRET, APP_KEY)
-		end_user = BigDoor::EndUser.new({'end_user_login' => user.facebook_id})
+		end_user = BigDoor::EndUser.new({'end_user_login' => facebook_id})
 		begin
-			end_user.load(client, user.facebook_id)
+			end_user.load(client, facebook_id)
 		rescue
 			end_user.save(client)
 		end
@@ -17,15 +17,15 @@ class Level < ActiveRecord::Base
 		ntg = BigDoor::NamedTransactionGroup.new
 		nt = BigDoor::NamedTransaction.new
 		case type
-		when :c2dm	
+		when "c2dm"
 			ntg.load(client, 731800)
 			nt.load(client, 828089)
-		when :nfc
+		when "nfc"
 			ntg.load(client, 731801)
 			nt.load(client, 828090)
 		end
 		ntg.associate_with(nt, client, 1)
-		response = ntg.execute(user.facebook_id, {'good_reciever' => user.facebook_id}, client)
+		response = ntg.execute(facebook_id, {'good_reciever' => facebook_id}, client)
 		return nil unless Hash === response
 		p response["end_user"]
 		level_num = response["end_user"]["level_summaries"].size
@@ -38,7 +38,7 @@ class Level < ActiveRecord::Base
 			:image_url => image_url,
 			:badge_type => type
 		}
-		level = Level.where(:user_id => user.id, :badge_type => type).first
+		level = Level.where(:facebook_id => facebook_id, :badge_type => type).first
 		if level
 			if level.level != level_num
 				level.update_attributes({:level => level_num, :level_name => level_name, :image_url => image_url})
@@ -50,7 +50,7 @@ class Level < ActiveRecord::Base
 				return result
 			end
 		else
-			Level.create({:user_id => user.id, :level => level_num, :level_name => level_name, :image_url => image_url, :badge_type => type})
+			Level.create({:facebook_id => facebook_id, :level => level_num, :level_name => level_name, :image_url => image_url, :badge_type => type})
 			return result
 		end
 	end
