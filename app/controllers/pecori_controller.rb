@@ -19,7 +19,7 @@ class PecoriController < ApplicationController
      pecori_message = "Pecori from " + pecorer_name
      message = {:message => pecori_message }
      if C2dmAccess.c2dm_post_message(pecoree_registration_id, token, message)
-       result = Level.update_count(@pecorer_user, type)
+       result = Level.update_count(pecorer_facebook_id, type)
        if result
          render :json =>  result.to_json, :status => 200
        else 
