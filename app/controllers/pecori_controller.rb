@@ -14,12 +14,15 @@ class PecoriController < ApplicationController
    if @pecoree_user and @pecorer_user
      pecoree_registration_id = @pecoree_user.registration_id 
      pecorer_name = @pecorer_user.name
- 
-     token = C2dmAccess.get_client_login()
+
      pecori_message = "Pecori from " + pecorer_name
-     message = {:message => pecori_message }
-     if C2dmAccess.c2dm_post_message(pecoree_registration_id, token, message)
+     registration_ids = [ pecoree_registration_id ]
+     data = {"message" => pecori_message }
+     gcm_result, gcm_result_message = GcmAccess.gcm_post_message(registration_ids, data)
+     if gcm_result
        result = Level.update_count(pecorer_facebook_id, type)
+#       for debug
+#       result = { "current_point" => "100", "leveled_up" => "true", "level_name" => "Master", "image_url" => "hoge", "badge_type" => "fuga" }
        if result
          render :json =>  result.to_json, :status => 200
        else 
