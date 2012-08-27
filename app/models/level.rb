@@ -1,58 +1,46 @@
 require 'json'
-require 'big_door'
-APP_KEY = '********'
-APP_SECRET = '********'
+require 'userinfuser/lib/userinfuser'
+APP_KEY = '*********************'
+USERINFUSER_ACCOUNT = "************************"
 
 class Level < ActiveRecord::Base
 
-	def self.update_count(facebook_id, type)
-		client = BigDoor::Client.new(APP_SECRET, APP_KEY)
-		end_user = BigDoor::EndUser.new({'end_user_login' => facebook_id})
-		begin
-			end_user.load(client, facebook_id)
-		rescue
-			end_user.save(client)
-		end
-
-		ntg = BigDoor::NamedTransactionGroup.new
-		nt = BigDoor::NamedTransaction.new
-		case type
-		when "c2dm"
-			ntg.load(client, 731800)
-			nt.load(client, 828089)
-		when "nfc"
-			ntg.load(client, 731801)
-			nt.load(client, 828090)
-		end
-		ntg.associate_with(nt, client, 1)
-		response = ntg.execute(facebook_id, {'good_reciever' => facebook_id}, client)
-		return nil unless Hash === response
-		p response["end_user"]
-		level_num = response["end_user"]["level_summaries"].size
-		level_name = response["end_user"]["level_summaries"].first["pub_title"]
-		image_url = response["end_user"]["level_summaries"].first["urls"].first["url"]
-		result = {
-			:current_point => response["end_user"]["currency_balances"].first["current_balance"],
-			:leveled_up => true,
-			:level_name => level_name,
-			:image_url => image_url,
-			:badge_type => type
-		}
-		level = Level.where(:facebook_id => facebook_id, :badge_type => type).first
-		if level
-			if level.level != level_num
-				level.update_attributes({:level => level_num, :level_name => level_name, :image_url => image_url})
-				return result
-			else
-				result[:leveled_up] = false
-				result[:level_name] = ""
-				result[:image_url] = ""
-				return result
-			end
-		else
-			Level.create({:facebook_id => facebook_id, :level => level_num, :level_name => level_name, :image_url => image_url, :badge_type => type})
-			return result
-		end
-	end
-
+  def self.update_count(facebook_id, type)
+    level = Level.where(:facebook_id => facebook_id, :badge_type => type).first
+    unless level
+      level = Level.new
+      level.level = 0
+      level.level_name = ""
+      level.image_url = ""
+      level.facebook_id = facebook_id
+      level.badge_type = type
+      level.save
+    end
+    ui = UserInfuser.new(USERINFUSER_ACCOUNT,  APP_KEY, true, false, false, true) 
+    case type
+    when "c2dm"
+      response = ui.award_badge_points(facebook_id,  "c2dm-#{level.level}-private",  10,  100 * (level.level + 1),  "c2dm")
+    when "nfc"
+      response = ui.award_badge_points(facebook_id,  "nfc-#{level.level}-private",  10,  50 * (level.level + 1),  "nfc")
+    end
+    level_name = response["badge"]["badgeRef"]["description"]
+    image_url = response["badge"]["downloadLink"]
+    result = {
+      :current_point => response["now_points"],
+      :leveled_up => true,
+      :level_name => level_name,
+      :image_url => image_url,
+      :badge_type => type
+    }
+    if response["badge_awarded"] == "yes"
+      level_num = level.level + 1
+      level.update_attributes({:level => level_num, :level_name => level_name, :image_url => image_url})
+      return result
+    else
+      result[:leveled_up] = false
+      result[:level_name] = ""
+      result[:image_url] = ""
+      return result
+    end
+  end
 end
