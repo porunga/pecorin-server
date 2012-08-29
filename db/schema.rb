@@ -11,16 +11,36 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120224042931) do
+ActiveRecord::Schema.define(:version => 20120827194734) do
+
+  create_table "levels", :force => true do |t|
+    t.integer  "level"
+    t.string   "level_name"
+    t.string   "image_url"
+    t.string   "badge_type",  :null => false
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+    t.string   "facebook_id", :null => false
+  end
+
+  create_table "pecoris", :force => true do |t|
+    t.integer  "pecorer_id"
+    t.integer  "pecoree_id"
+    t.string   "pecori_type"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
 
   create_table "users", :force => true do |t|
-    t.string   "facebook_id",     :null => false
+    t.string   "facebook_id",         :null => false
+    t.string   "pecorin_token"
     t.string   "access_token"
     t.string   "name"
     t.string   "image_url"
     t.string   "registration_id"
-    t.datetime "created_at",      :null => false
-    t.datetime "updated_at",      :null => false
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
+    t.text     "current_location_id"
   end
 
 end
